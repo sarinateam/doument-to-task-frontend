@@ -5,10 +5,10 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 export const analyzeDocument = async (
   content: string | File,
   onProgress: (progress: number, message: string) => void
-): Promise<DocumentAnalysisResult> => {
+): Promise<DocumentAnalysisResult & { documentName?: string }> => {
   try {
     // Create a promise that will resolve when we get the final result
-    const resultPromise = new Promise<DocumentAnalysisResult>((resolve, reject) => {
+    const resultPromise = new Promise<DocumentAnalysisResult & { documentName?: string }>((resolve, reject) => {
       // Set a timeout to reject the promise if we don't get a response within 2 minutes
       const timeoutId = setTimeout(() => {
         console.error('Timeout waiting for SSE response');
@@ -80,7 +80,8 @@ export const analyzeDocument = async (
                   clearTimeout(timeoutId);
                   resolve({
                     tasks: data.result.tasks,
-                    summary: data.result.summary
+                    summary: data.result.summary,
+                    documentName: data.result.documentName
                   });
                 } else if (data.type === 'error') {
                   console.error('Error in SSE response:', data.error);
@@ -128,7 +129,7 @@ export const analyzeDocument = async (
   }
 };
 
-export const exportTasksToExcel = async (tasks: Task[]): Promise<void> => {
+export const exportTasksToExcel = async (tasks: Task[], documentName?: string): Promise<void> => {
   try {
     console.log('Exporting tasks to Excel:', tasks);
     console.log('Tasks length:', tasks.length);
@@ -153,7 +154,7 @@ export const exportTasksToExcel = async (tasks: Task[]): Promise<void> => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ tasks }),
+      body: JSON.stringify({ tasks, documentName }),
     });
     
     console.log('Export response status:', response.status);
@@ -188,7 +189,7 @@ export const exportTasksToExcel = async (tasks: Task[]): Promise<void> => {
       // Create a temporary link element
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'tasks.xlsx';
+      a.download = documentName ? `${documentName}.xlsx` : 'tasks.xlsx';
       
       // Append to the document, click it, and remove it
       document.body.appendChild(a);

@@ -5,9 +5,10 @@ import './TaskList.css';
 
 interface TaskListProps {
   tasks: Task[];
+  documentName?: string;
 }
 
-const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
+const TaskList: React.FC<TaskListProps> = ({ tasks, documentName }) => {
   // Map string categories to TaskCategory enum
   const mappedTasks = tasks.map(task => {
     // If category is already a TaskCategory enum, use it as is
@@ -105,7 +106,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
   const handleExportToExcel = async () => {
     try {
       console.log('Export button clicked, tasks:', tasks);
-      await exportTasksToExcel(tasks);
+      await exportTasksToExcel(tasks, documentName);
     } catch (error) {
       console.error('Failed to export tasks to Excel:', error);
       alert('Failed to export tasks to Excel. Please try again.');

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import DocumentUpload from './components/DocumentUpload';
+import TaskList from './components/TaskList';
 import { Task, TaskCategory } from './types';
 import { exportTasksToExcel } from './services/api';
 import './App.css';
@@ -9,8 +10,9 @@ function App() {
   const [summary, setSummary] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [documentName, setDocumentName] = useState<string>('');
 
-  const handleAnalysisComplete = (result: { tasks: Task[]; summary: string }) => {
+  const handleAnalysisComplete = (result: { tasks: Task[]; summary: string; documentName?: string }) => {
     console.log('Analysis complete, raw result:', result);
     console.log('Tasks from result:', result.tasks);
     console.log('Tasks length:', result.tasks.length);
@@ -37,6 +39,7 @@ function App() {
     
     setTasks(validTasks);
     setSummary(result.summary);
+    setDocumentName(result.documentName || '');
     setIsLoading(false);
     setError(null);
   };
@@ -98,15 +101,7 @@ function App() {
         )}
 
         {tasks.length > 0 && (
-          <div className="export-container">
-            <button 
-              className="export-button-large"
-              onClick={handleExportToExcel}
-              title="Export tasks to Excel"
-            >
-              <span className="export-icon">📊</span> Export Tasks to Excel
-            </button>
-          </div>
+          <TaskList tasks={tasks} documentName={documentName} />
         )}
       </main>
 
