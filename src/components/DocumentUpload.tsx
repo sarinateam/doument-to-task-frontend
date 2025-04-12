@@ -18,6 +18,7 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
   const [progressMessage, setProgressMessage] = useState<string>('');
+  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -60,6 +61,7 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({
     onLoading(true);
     setProgress(0);
     setProgressMessage('Starting analysis...');
+    setIsAnalyzing(true);
     
     try {
       let result;
@@ -99,6 +101,8 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({
       // Ensure progress is set to 100% when complete
       setProgress(100);
       setProgressMessage('Analysis complete!');
+      setIsAnalyzing(false);
+      onLoading(false);
     }
   };
 
@@ -169,18 +173,20 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({
         </button>
       </form>
       
-      <div className="progress-container">
-        <div className="progress-bar">
-          <div 
-            className="progress-fill"
-            style={{ width: `${progress}%` }}
-          ></div>
+      {isAnalyzing && (
+        <div className="progress-container">
+          <div className="progress-bar">
+            <div 
+              className="progress-fill"
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
+          <div className="progress-info">
+            <span className="progress-message">{progressMessage}</span>
+            <span className="progress-percentage">{progress}%</span>
+          </div>
         </div>
-        <div className="progress-info">
-          <span className="progress-message">{progressMessage || 'Ready to analyze'}</span>
-          <span className="progress-percentage">{progress}%</span>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -52,6 +52,12 @@ function App() {
 
   const handleLoading = (loading: boolean) => {
     setIsLoading(loading);
+    if (loading) {
+      // Clear previous tasks and summary when starting new analysis
+      setTasks([]);
+      setSummary('');
+      setError(null);
+    }
   };
 
   const handleExportToExcel = async () => {
